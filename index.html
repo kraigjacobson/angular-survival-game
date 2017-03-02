@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html ng-app="myApp">
+    <head>
+        <title>Angular</title>
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="main.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
+        <script src="app.js"></script>
+    </head>
+    <body ng-controller="mainController">
+        
+        <div class='container'>
+
+            <div class="span-12">
+
+                <h1>Stranded!</h1>
+
+                <!--Action Buttons-->
+
+                <div class="btn btn-primary" ng-click='action.gather( "wood" )'>Gather Wood</div>
+                <div class="btn btn-primary" ng-click='action.gather( "stone" )'>Gather Stone</div>
+                <div class="btn btn-primary" ng-click='action.gather( "fibers" )'>Gather Plant Fibers</div>
+                <div class="btn btn-primary" ng-click='action.forage()'>Forage</div>
+                <div class="btn btn-primary" ng-click='action.ingest( "insects" )' ng-show="inventory.insects > 0">Eat Insects</div>
+                <div class="btn btn-primary" ng-click='action.ingest( "leaves" )' ng-show="inventory.leaves > 0">Eat Edible Plants</div>
+                <div class="btn btn-primary" ng-click='action.ingest( "rawMeat" )' ng-show="inventory.rawMeat > 0">Eat Raw Meat</div>
+                <div class="btn btn-primary" ng-click='action.ingest( "cookedMeat" )' ng-show="inventory.cookedMeat > 0">Eat Cooked Meat</div>
+                <div class="btn btn-primary" ng-click='action.ingest( "water" )' ng-show="inventory.water > 0">Drink Water</div>
+                <div class="btn btn-primary" ng-click='action.sleep()' ng-show="stats.exhaustion > 0">Sleep</div>
+                <div class="btn btn-primary" ng-click='action.hunt()' ng-show="inventory.spear > 0">Hunt</div>
+
+            </div>
+
+            <div class="span-12">
+
+                <!--Crafting Buttons-->
+
+                <!--Shelters-->
+                <div class="btn btn-primary" ng-click='action.build.shelter( "leanto" )' ng-show="inventory.wood >= crafted.shelter.leanto.wood && inventory.stone >= crafted.shelter.leanto.stone && inventory.fibers >= crafted.shelter.leanto.fibers && stats.shelter === 'None'">Build Lean To</div>
+                <div class="btn btn-primary" ng-click='action.build.shelter( "hut" )' ng-show="inventory.wood >= crafted.shelter.hut.wood && inventory.stone >= crafted.shelter.hut.stone && inventory.fibers >= crafted.shelter.hut.fibers && stats.shelter === 'Lean To'">Build Hut</div>
+                <div class="btn btn-primary" ng-click='action.build.shelter( "shack" )' ng-show="inventory.wood >= crafted.shelter.shack.wood && inventory.stone >= crafted.shelter.shack.stone && inventory.fibers >= crafted.shelter.shack.fibers && stats.shelter === 'Hut'">Build Shack</div>
+                <div class="btn btn-primary" ng-click='action.build.shelter( "cabin" )' ng-show="inventory.wood >= crafted.shelter.cabin.wood && inventory.stone >= crafted.shelter.cabin.stone && inventory.fibers >= crafted.shelter.cabin.fibers && stats.shelter === 'Shack'">Build Cabin</div>
+
+                <!--Tools-->
+                <div class="btn btn-primary" ng-click='action.build.tool( "ax" )' ng-show="inventory.wood >= crafted.tool.ax.wood && inventory.stone >= crafted.tool.ax.stone && inventory.fibers >= crafted.tool.ax.fibers && inventory.ax < 1">Build Ax</div>
+                <div class="btn btn-primary" ng-click='action.build.tool( "club" )' ng-show="inventory.wood >= crafted.tool.club.wood && inventory.stone >= crafted.tool.club.stone && inventory.fibers >= crafted.tool.club.fibers && inventory.club < 1">Build Club</div>
+                <div class="btn btn-primary" ng-click='action.build.tool( "spear" )' ng-show="inventory.wood >= crafted.tool.spear.wood && inventory.stone >= crafted.tool.spear.stone && inventory.fibers >= crafted.tool.spear.fibers && inventory.spear < 1">Build Spear</div>
+                <div class="btn btn-primary" ng-click='action.build.tool( "knife" )' ng-show="inventory.wood >= crafted.tool.knife.wood && inventory.stone >= crafted.tool.knife.stone && inventory.fibers >= crafted.tool.knife.fibers && inventory.knife < 1">Build Knife</div>
+
+                <!--Upgraders-->
+                <div class="btn btn-primary" ng-click='action.build.tool( "campfire" )' ng-show="inventory.wood >= crafted.tool.campfire.wood && inventory.stone >= crafted.tool.campfire.stone && inventory.fibers >= crafted.tool.campfire.fibers && inventory.campfire < 1">Build Campfire</div>
+                <div class="btn btn-primary" ng-click='action.build.tool( "raincatcher" )' ng-show="inventory.wood >= crafted.tool.raincatcher.wood && inventory.stone >= crafted.tool.raincatcher.stone && inventory.fibers >= crafted.tool.raincatcher.fibers && inventory.raincatcher < 1">Build Rain Catcher</div>
+
+                <!--Food-->
+                <div class="btn btn-primary" ng-click='action.cook.meat()' ng-show="inventory.campfire > 0 && inventory.rawMeat > 0">Cook Meat</div>
+
+            </div>
+
+            <div id="stats" class="col-sm-4">
+
+                <h3>Stats</h3>
+
+                <span>Name: {{ stats.name }}<br/></span>
+                <span>Health: {{ stats.health }}<br/></span>
+                <span>Hunger: {{ stats.hunger }}<br/></span>
+                <span>Thirst: {{ stats.thirst }}<br/></span>
+                <span>Exhaustion: {{ stats.exhaustion }}<br/></span>
+                <span>Shelter: {{ stats.shelter }}<br/></span>
+
+            </div>
+
+            <div id="inventory" class="col-sm-4">
+
+                <h3>Inventory</h3>
+
+                <!--basic materials-->
+                <span ng-if="inventory.wood > 0">Wood: {{ inventory.wood }}<br/></span>
+                <span ng-if="inventory.stone > 0">Stone: {{ inventory.stone }}<br/></span>
+                <span ng-if="inventory.fibers > 0">Plant Fibers: {{ inventory.fibers }}<br/></span>
+
+                <!--consumables-->
+                <span ng-if="inventory.insects > 0">Insects: {{ inventory.insects }}<br/></span>
+                <span ng-if="inventory.ediblePlants > 0">Edible Plants: {{ inventory.ediblePlants }}<br/></span>
+                <span ng-if="inventory.rawMeat > 0">Raw Meat: {{ inventory.rawMeat }}<br/></span>
+                <span ng-if="inventory.cookedMeat > 0">Cooked Meat: {{ inventory.cookedMeat }}<br/></span>
+                <span ng-if="inventory.water > 0">Water: {{ inventory.water }}<br/></span>
+
+                <!--crafting materials-->
+                <span ng-if="inventory.feathers > 0">Feathers: {{ inventory.feathers }}<br/></span>
+                <span ng-if="inventory.hide > 0">Hide: {{ inventory.hide }}<br/></span>
+                <span ng-if="inventory.leather > 0">Leather: {{ inventory.leather }}<br/></span>
+
+                <!--tools-->
+                <h3 ng-if="inventory.ax === true || inventory.club === true || inventory.spear === true || inventory.knife === true">Tools</h3>
+
+                <span ng-if="inventory.ax > 0">Ax<br/></span>
+                <span ng-if="inventory.club > 0">Club<br/></span>
+                <span ng-if="inventory.spear > 0">Spear<br/></span>
+                <span ng-if="inventory.knife > 0">Knife<br/></span>
+
+                <span ng-if="inventory.campfire > 0">Campfire<br/></span>
+                <span ng-if="inventory.raincatcher > 0">Rain Catcher<br/></span>
+
+            </div>
+
+            <div id="bonuses" class="col-sm-4">
+
+                <h3>Effects</h3>
+
+                <span ng-show="inventory.knife > 0">Knife - Animal Harvesting Bonus<br/></span>
+                <span ng-show="inventory.campfire > 0">Campfire - Ability to Cook Meat<br/></span>
+                <span ng-show="inventory.raincatcher > 0">Rain Catcher - Water Collection Bonus<br/></span>
+
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div id="output" class="alert alert-info col-xs-12"><br/></div>
+            
+        </div>
+        
+    </body>
+</html>
